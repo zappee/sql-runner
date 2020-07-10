@@ -1,5 +1,7 @@
 package com.remal.sqlrunner;
 
+import java.util.concurrent.Callable;
+
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -19,23 +21,43 @@ import picocli.CommandLine.Parameters;
 @Command(name = "SqlRunner",
         sortOptions = false,
         usageHelpWidth = 100,
-        description = "SQL command line tool. It executes the given SQL and show the result on the standard output.\n",
-        parameterListHeading = "General options:\n",
-        footerHeading = "\nPlease report issues at arnold.somogyi@gmail.com.",
-        footer = "\nDocumentation, source code: https://github.com/zappee/sql-runner.git")
-public class SqlRunner implements Runnable {
+        description = "SQL command line tool. It executes the given SQL and show the result on the standard output.%n",
+        parameterListHeading = "General options:%n",
+        footerHeading = "%nPlease report issues at arnold.somogyi@gmail.com.",
+        footer = "%nDocumentation, source code: https://github.com/zappee/sql-runner.git")
+public class SqlRunner implements Callable<Integer> {
 
     /**
      * Definition of the general command line options.
      */
     @Option(names = {"-?", "--help"}, usageHelp = true, description = "Display this help and exit.")
-    private boolean help;
+    private static boolean help;
 
     @Option(names = {"-d", "--dialect"}, defaultValue = "oracle", showDefaultValue = CommandLine.Help.Visibility.ALWAYS, description = "Supported SQL dialects: oracle.")
     private static String dialect;
 
-    @ArgGroup(exclusive = true, multiplicity = "1", heading = "\nProvide a JDBC URL:\n")
+    @Option(names = {"-U", "--user"}, required = true, description = "Name for the login.")
+    private static String user;
+
+    @ArgGroup(exclusive = true, multiplicity = "1", heading = "%nSpecify a password for the connecting user:%n")
+    PasswordArgGroup passwordArgGroup;
+
+    @ArgGroup(exclusive = true, multiplicity = "1", heading = "%nProvide a JDBC URL:%n")
     MainArgGroup mainArgGroup;
+
+    /**
+     * A parameter group for password.
+     * Password can be provided on two different ways:
+     *    (1) via a parameter
+     *    (1) use the interactive mode where user needs to type the password
+     */
+    static class PasswordArgGroup {
+        @Option(names = {"-P", "--password"}, required = true, description = "Password for the connecting user.")
+        private static String password;
+
+        @Option(names = {"-I", "--iPassword"}, required = true, interactive = true, description = "Interactive way to get the password for the connecting user.")
+        private static String interactivePassword;
+    }
 
     /**
      * Two exclusive parameter groups:
@@ -50,17 +72,17 @@ public class SqlRunner implements Runnable {
         private static String jdbcUrl;
 
         /**
-         * Custom connection parameter group.
+         * Custom connection parameters group.
          */
-        @ArgGroup(exclusive = false, multiplicity = "1", heading = "\nCustom configuration:\n")
-        CustomConfigurationGroup customConfigurationGroup;
+        @ArgGroup(exclusive = false, multiplicity = "1", heading = "%nCustom configuration:%n")
+        private static CustomConfigurationGroup customConfigurationGroup;
     }
 
     /**
      * Definition of the SQL which will be executed.
      */
     @Parameters(index = "0", arity = "1", description = "SQL to be executed. Example: 'select 1 from dual'")
-    String sql;
+    private static String sql;
 
     /**
      * Custom connection parameters.
@@ -70,16 +92,10 @@ public class SqlRunner implements Runnable {
         private static String host;
 
         @Option(names = {"-p", "--port"}, required = true, description = "Number of the port where the server listens for requests.")
-        private static String port;
+        private static int port;
 
         @Option(names = {"-s", "--sid"}, required = true, description = "Name of the particular database on the server. Also known as the SID in Oracle terminology.")
         private static String sid;
-
-        @Option(names = {"-U", "--user"}, required = true, description = "Name for the login.")
-        private static String user;
-
-        @Option(names = {"-P", "--password"}, required = true, description = "Password for the connecting user.")
-        private static String password;
     }
 
     /**
@@ -97,8 +113,8 @@ public class SqlRunner implements Runnable {
      * It is used to create a thread.
      */
     @Override
-    public void run() {
-        int exitCode = 0; //executeMyStaff();
-        System.exit(exitCode);
+    public Integer call() throws Exception {
+        //return executeMyStaff();
+        return 0;
     }
 }
