@@ -1,7 +1,9 @@
 package com.remal.sqlrunner;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
+import com.remal.sqlrunner.domain.Dialect;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -23,6 +25,12 @@ import picocli.CommandLine.Parameters;
         usageHelpWidth = 100,
         description = "SQL command line tool. It executes the given SQL and show the result on the standard output.%n",
         parameterListHeading = "General options:%n",
+        exitCodeListHeading = "%nExit codes:%n",
+        exitCodeOnUsageHelp = 3,
+        exitCodeList = {
+                "1:Successful program execution.",
+                "2:An unexpected error appeared while executing the SQL statement.",
+                "3:Usage error. User input for the command was incorrect." },
         footerHeading = "%nPlease report issues at arnold.somogyi@gmail.com.",
         footer = "%nDocumentation, source code: https://github.com/zappee/sql-runner.git")
 public class SqlRunner implements Callable<Integer> {
@@ -30,19 +38,37 @@ public class SqlRunner implements Callable<Integer> {
     /**
      * Definition of the general command line options.
      */
-    @Option(names = {"-?", "--help"}, usageHelp = true, description = "Display this help and exit.")
-    private static boolean help;
+    @Option(names = {"-?", "--help"},
+            usageHelp = true,
+            description = "Display this help and exit.")
+    private boolean help;
 
-    @Option(names = {"-d", "--dialect"}, defaultValue = "oracle", showDefaultValue = CommandLine.Help.Visibility.ALWAYS, description = "Supported SQL dialects: oracle.")
-    private static String dialect;
+    @Option(names = {"-v", "--verbose"},
+            description = "It provides additional details as to what the tool is doing.")
+    private boolean verbose;
 
-    @Option(names = {"-U", "--user"}, required = true, description = "Name for the login.")
-    private static String user;
+    @Option(names = {"-t", "--dialect"},
+            defaultValue = Dialect.ORACLE_VALUE,
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
+            description = "SQL dialect used during the execution of the SQL statement. "
+                    + "Supported SQL dialects: ${COMPLETION-CANDIDATES}.")
+    private Dialect dialect;
 
-    @ArgGroup(exclusive = true, multiplicity = "1", heading = "%nSpecify a password for the connecting user:%n")
+    @Option(names = {"-s", "--showHeader"},
+            description = "Shows the name of the fields from the SQL result set.")
+    private boolean showHeader;
+
+    @Option(names = {"-U", "--user"},
+            required = true,
+            description = "Name for the login.")
+    private String user;
+
+    @ArgGroup(multiplicity = "1",
+            heading = "%nSpecify a password for the connecting user:%n")
     PasswordArgGroup passwordArgGroup;
 
-    @ArgGroup(exclusive = true, multiplicity = "1", heading = "%nProvide a JDBC URL:%n")
+    @ArgGroup(multiplicity = "1",
+            heading = "%nProvide a JDBC URL:%n")
     MainArgGroup mainArgGroup;
 
     /**
@@ -52,11 +78,16 @@ public class SqlRunner implements Callable<Integer> {
      *    (1) use the interactive mode where user needs to type the password
      */
     static class PasswordArgGroup {
-        @Option(names = {"-P", "--password"}, required = true, description = "Password for the connecting user.")
-        private static String password;
+        @Option(names = {"-P", "--password"},
+                required = true,
+                description = "Password for the connecting user.")
+        private String password;
 
-        @Option(names = {"-I", "--iPassword"}, required = true, interactive = true, description = "Interactive way to get the password for the connecting user.")
-        private static String interactivePassword;
+        @Option(names = {"-I", "--iPassword"},
+                required = true,
+                interactive = true,
+                description = "Interactive way to get the password for the connecting user.")
+        private String interactivePassword;
     }
 
     /**
@@ -68,34 +99,47 @@ public class SqlRunner implements Callable<Integer> {
         /**
          * JDBC URL option (only one parameter).
          */
-        @Option(names = {"-j", "--jdbcUrl"}, arity = "1", description = "JDBC URL, example: jdbc:oracle:<drivertype>:@//<host>:<port>/<database>.")
-        private static String jdbcUrl;
+        @Option(names = {"-j", "--jdbcUrl"},
+                arity = "1",
+                description = "JDBC URL, example: jdbc:oracle:<drivertype>:@//<host>:<port>/<database>.")
+        private String jdbcUrl;
 
         /**
          * Custom connection parameters group.
          */
-        @ArgGroup(exclusive = false, multiplicity = "1", heading = "%nCustom configuration:%n")
-        private static CustomConfigurationGroup customConfigurationGroup;
+        @ArgGroup(exclusive = false,
+                multiplicity = "1",
+                heading = "%nCustom configuration:%n")
+        private CustomConfigurationGroup customConfigurationGroup;
     }
 
     /**
      * Definition of the SQL which will be executed.
      */
-    @Parameters(index = "0", arity = "1", description = "SQL to be executed. Example: 'select 1 from dual'")
-    private static String sql;
+    @Parameters(index = "0",
+            arity = "1",
+            description = "SQL to be executed. Example: 'select 1 from dual'")
+    private String sql;
 
     /**
      * Custom connection parameters.
      */
     static class CustomConfigurationGroup {
-        @Option(names = {"-h", "--host"}, required = true, description = "Name of the database server.")
-        private static String host;
+        @Option(names = {"-h", "--host"},
+                required = true,
+                description = "Name of the database server.")
+        private String host;
 
-        @Option(names = {"-p", "--port"}, required = true, description = "Number of the port where the server listens for requests.")
-        private static int port;
+        @Option(names = {"-p", "--port"},
+                required = true,
+                description = "Number of the port where the server listens for requests.")
+        private int port;
 
-        @Option(names = {"-s", "--sid"}, required = true, description = "Name of the particular database on the server. Also known as the SID in Oracle terminology.")
-        private static String sid;
+        @Option(names = {"-d", "--database"},
+                required = true,
+                description = "Name of the particular database on the server. Also known as the SID in Oracle "
+                        + "terminology.")
+        private String sid;
     }
 
     /**
@@ -111,10 +155,34 @@ public class SqlRunner implements Callable<Integer> {
 
     /**
      * It is used to create a thread.
+     *
+     * @return exit code
      */
     @Override
-    public Integer call() throws Exception {
-        //return executeMyStaff();
-        return 0;
+    public Integer call() {
+        // initialization of the SQL statement executor
+        SqlStatementExecutor executor;
+        if (Objects.nonNull(passwordArgGroup.password)) {
+            executor = new SqlStatementExecutor(user, passwordArgGroup.password);
+        } else {
+            executor = new SqlStatementExecutor(user, passwordArgGroup.interactivePassword);
+        }
+
+        executor.setVerbose(verbose);
+        executor.setShowHeader(showHeader);
+
+        // execute the SQL statement and print the resut to the standard output
+        if (Objects.nonNull(mainArgGroup.jdbcUrl)) {
+            return executor.execute(mainArgGroup.jdbcUrl, sql).getExitCode();
+        } else {
+            return executor
+                    .execute(
+                            dialect,
+                            mainArgGroup.customConfigurationGroup.host,
+                            mainArgGroup.customConfigurationGroup.port,
+                            mainArgGroup.customConfigurationGroup.sid,
+                            sql)
+                    .getExitCode();
+        }
     }
 }

@@ -15,6 +15,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <picocli.version>4.4.0</picocli.version>
+        <ojdbc8.version>12.2.0.1</ojdbc8.version>
     </properties>
 
     <build>
@@ -47,8 +50,13 @@
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
-            <version>4.4.0</version>
+            <version>${picocli.version}</version>
+        </dependency>
+        <!-- oracle Database JDBC driver -->
+        <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>${ojdbc8.version}</version>
         </dependency>
     </dependencies>
-
 </project>
