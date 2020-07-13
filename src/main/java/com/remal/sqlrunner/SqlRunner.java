@@ -11,8 +11,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /**
- * SQL command line tool.
- * It executes the given SQL and show the result on the standard output.
+ * SQL command-line tool.
+ * The tool executes the given SQL and shows the result on the standard output.
  *
  * <p>
  * created on 09/07/2020
