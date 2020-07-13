@@ -22,6 +22,7 @@
 
     <build>
         <plugins>
+            <!-- packaging the project to an auto-launch uber JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
