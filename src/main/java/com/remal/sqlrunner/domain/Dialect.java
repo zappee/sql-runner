@@ -48,4 +48,13 @@ public enum Dialect {
                 .replace("port", String.valueOf(port))
                 .replace("database", database);
     }
+
+    /**
+     * Getter.
+     *
+     * @return the string representation of the enum value
+     */
+    public String getValue() {
+        return value;
+    }
 }
