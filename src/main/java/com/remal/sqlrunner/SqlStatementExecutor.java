@@ -131,8 +131,6 @@ public class SqlStatementExecutor {
         properties.put(OracleConnection.CONNECTION_PROPERTY_DOWN_HOSTS_TIMEOUT, timeout);
         properties.put("oracle.jdbc.ReadTimeout", timeout);
         properties.put("oracle.net.CONNECT_TIMEOUT", timeout);
-        System.setProperty("sun.net.client.defaultReadTimeout", timeout);
-        System.setProperty("sun.net.client.defaultConnectTimeout", timeout);
 
         properties.put (OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
         properties.put (OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
@@ -140,6 +138,9 @@ public class SqlStatementExecutor {
         System.setProperty("oracle.net.READ_TIMEOUT", timeout);
         System.setProperty("oracle.jdbc.ReadTimeout", timeout);
         System.setProperty("oracle.jdbc.javaNetNio", "true");
+
+        System.setProperty("sun.net.client.defaultReadTimeout", timeout);
+        System.setProperty("sun.net.client.defaultConnectTimeout", timeout);
 
         DriverManager.setLoginTimeout(Integer.valueOf(timeout));
         Connection connection = DriverManager.getConnection(jdbcUrl, properties);
