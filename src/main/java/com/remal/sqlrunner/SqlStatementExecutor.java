@@ -6,9 +6,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import oracle.jdbc.driver.OracleConnection;
 
 /**
  * This class connects to the database and executes the provided SQL statement.
@@ -117,6 +120,31 @@ public class SqlStatementExecutor {
         if (verbose) {
             out.println("getting connection to " + jdbcUrl + "...");
         }
-        return DriverManager.getConnection(jdbcUrl, user, password);
+
+        String timeout = "1000";
+        Properties properties = new Properties();
+        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_NET_CONNECT_TIMEOUT, timeout);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_READ_TIMEOUT, timeout);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_JNDI_LDAP_CONNECT_TIMEOUT, timeout);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_JNDI_LDAP_READ_TIMEOUT, timeout);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_OUTBOUND_CONNECT_TIMEOUT, timeout);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_DOWN_HOSTS_TIMEOUT, timeout);
+        properties.put("oracle.jdbc.ReadTimeout", timeout);
+        properties.put("oracle.net.CONNECT_TIMEOUT", timeout);
+        System.setProperty("sun.net.client.defaultReadTimeout", timeout);
+        System.setProperty("sun.net.client.defaultConnectTimeout", timeout);
+
+        properties.put (OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
+        properties.put (OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
+
+        System.setProperty("oracle.net.READ_TIMEOUT", timeout);
+        System.setProperty("oracle.jdbc.ReadTimeout", timeout);
+        System.setProperty("oracle.jdbc.javaNetNio", "true");
+
+        DriverManager.setLoginTimeout(Integer.valueOf(timeout));
+        Connection connection = DriverManager.getConnection(jdbcUrl, properties);
+        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), Integer.valueOf(timeout));
+
+        return connection;
     }
 }
