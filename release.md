@@ -7,7 +7,12 @@ All notable changes to this project will be documented in this file.
 #### Added
 - Initial version based on the requirements
 
-### [x.y.z] - yyyy-mm-dd
+### [0.2.0] - yyyy-mm-dd
+#### Added
+- `-t, --timeout:` a new command line parameter
+#### Changed
+#### Removed
+
 #### Added
 #### Changed
-#### removed
+#### Removed

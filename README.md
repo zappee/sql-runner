@@ -22,15 +22,15 @@ echo ok
 
 ## 3) Usage
 ~~~~
-Usage: SqlRunner [-?sv] [-t=<dialect>] -U=<user> (-P=<password> | -I) (-j=<jdbcUrl> | (-h=<host>
-                 -p=<port> -d=<sid>)) <sql>
+Usage: SqlRunner [-?sv] [-c=<dialect>] -U=<user> (-P=<password> | -I) (-j=<jdbcUrl> | (-h=<host>
+                 -p=<port> -d=<database>)) <sql>
 SQL command line tool. It executes the given SQL and show the result on the standard output.
 
 General options:
       <sql>                 SQL to be executed. Example: 'select 1 from dual'
   -?, --help                Display this help and exit.
   -v, --verbose             It provides additional details as to what the tool is doing.
-  -t, --dialect=<dialect>   SQL dialect used during the execution of the SQL statement. Supported
+  -c, --dialect=<dialect>   SQL dialect used during the execution of the SQL statement. Supported
                               SQL dialects: ORACLE.
                               Default: ORACLE
   -s, --showHeader          Shows the name of the fields from the SQL result set.

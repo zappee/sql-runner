@@ -48,7 +48,7 @@ public class SqlRunner implements Callable<Integer> {
             description = "It provides additional details as to what the tool is doing.")
     private boolean verbose;
 
-    @Option(names = {"-t", "--dialect"},
+    @Option(names = {"-c", "--dialect"},
             defaultValue = Dialect.ORACLE_VALUE,
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             description = "SQL dialect used during the execution of the SQL statement. "
