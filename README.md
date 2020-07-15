@@ -1,9 +1,13 @@
 # TODO: this content needs to be updated and finished 
 
-[release note](release.md)
+> [Release Note](release.md)
 
-The tool can be used from script files.
-A possible Docker use case to check whether the database server is ready to receiver incoming connections or not:
+## 1) Overview
+The tool can be used from Windows/Linux script files.
+
+## 2) Use cases
+#### 2.1) Database status check
+A possible use case in Docker environment is to check whether the database server is ready to receive incoming connections or not:
 ~~~
 #!/bin/bash
 
@@ -16,7 +20,7 @@ done
 echo ok
 ~~~
 
-**Usage**
+## 3) Usage
 ~~~~
 Usage: SqlRunner [-?sv] [-t=<dialect>] -U=<user> (-P=<password> | -I) (-j=<jdbcUrl> | (-h=<host>
                  -p=<port> -d=<sid>)) <sql>
@@ -39,7 +43,7 @@ Specify a password for the connecting user:
 Custom configuration:
   -h, --host=<host>         Name of the database server.
   -p, --port=<port>         Number of the port where the server listens for requests.
-  -d, --database=<sid>      Name of the particular database on the server. Also known as the SID in
+  -d, --database=<database> Name of the particular database on the server. Also known as the SID in
                               Oracle terminology.
 
 Provide a JDBC URL:
@@ -51,6 +55,6 @@ Exit codes:
   3   Usage error. User input for the command was incorrect.
 ~~~~
 
-**Examples**
-* `java -jar target/sql-runner-1.0-with-dependencies.jar -j jdbc:oracle:thin:@//localhost:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SLM.APPLICATION"`
-* `java -jar target/sql-runner-1.0-with-dependencies.jar -h localhost -p 1521 -d ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SLM.APPLICATION"`
+## 4) Examples
+* `java -jar target/sql-runner-1.0-with-dependencies.jar -j jdbc:oracle:thin:@//localhost:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SCHEMA.TABLE"`
+* `java -jar target/sql-runner-1.0-with-dependencies.jar -h localhost -p 1521 -d ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SCHEMA.TABLE"`
