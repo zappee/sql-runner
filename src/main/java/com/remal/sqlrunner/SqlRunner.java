@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import com.remal.sqlrunner.domain.Dialect;
+import com.remal.sqlrunner.domain.ExitCode;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -26,11 +27,11 @@ import picocli.CommandLine.Parameters;
         description = "SQL command line tool. It executes the given SQL and show the result on the standard output.%n",
         parameterListHeading = "General options:%n",
         exitCodeListHeading = "%nExit codes:%n",
-        exitCodeOnUsageHelp = 3,
+        exitCodeOnUsageHelp = ExitCode.CLI_ERROR_EXIT_CODE,
         exitCodeList = {
-                "1:Successful program execution.",
-                "2:An unexpected error appeared while executing the SQL statement.",
-                "3:Usage error. User input for the command was incorrect." },
+                "0:Successful program execution.",
+                "1:An unexpected error appeared while executing the SQL statement.",
+                "2:Usage error. User input for the command was incorrect." },
         footerHeading = "%nPlease report issues at arnold.somogyi@gmail.com.",
         footer = "%nDocumentation, source code: https://github.com/zappee/sql-runner.git")
 public class SqlRunner implements Callable<Integer> {
@@ -47,7 +48,7 @@ public class SqlRunner implements Callable<Integer> {
             description = "It provides additional details as to what the tool is doing.")
     private boolean verbose;
 
-    @Option(names = {"-t", "--dialect"},
+    @Option(names = {"-c", "--dialect"},
             defaultValue = Dialect.ORACLE_VALUE,
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             description = "SQL dialect used during the execution of the SQL statement. "
@@ -139,7 +140,7 @@ public class SqlRunner implements Callable<Integer> {
                 required = true,
                 description = "Name of the particular database on the server. Also known as the SID in Oracle "
                         + "terminology.")
-        private String sid;
+        private String database;
     }
 
     /**
@@ -180,7 +181,7 @@ public class SqlRunner implements Callable<Integer> {
                             dialect,
                             mainArgGroup.customConfigurationGroup.host,
                             mainArgGroup.customConfigurationGroup.port,
-                            mainArgGroup.customConfigurationGroup.sid,
+                            mainArgGroup.customConfigurationGroup.database,
                             sql)
                     .getExitCode();
         }

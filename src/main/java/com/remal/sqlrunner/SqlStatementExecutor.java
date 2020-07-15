@@ -6,9 +6,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import oracle.jdbc.driver.OracleConnection;
 
 /**
  * This class connects to the database and executes the provided SQL statement.
@@ -20,6 +23,8 @@ import com.remal.sqlrunner.domain.ExitCode;
  * @author arnold.somogyi@gmail.com
  */
 public class SqlStatementExecutor {
+
+    private static final int ONE_SECOND_IN_MILLISEC = 1000;
 
     private PrintStream out = System.out;
     private boolean verbose = false;
@@ -117,6 +122,28 @@ public class SqlStatementExecutor {
         if (verbose) {
             out.println("getting connection to " + jdbcUrl + "...");
         }
-        return DriverManager.getConnection(jdbcUrl, user, password);
+
+        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLISEC / 1000);
+
+        Properties properties = getConnectionArguments(user, password);
+        Connection connection = DriverManager.getConnection(jdbcUrl, properties);
+        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLISEC);
+
+        return connection;
+    }
+
+    /**
+     * Build a list of arbitrary string tag/value pairs as connection arguments.
+     * Normally at least a "user" and "password" property should be included.
+     *
+     * @param user username
+     * @param password password
+     * @return connection argument list
+     */
+    private Properties getConnectionArguments(String user, String password) {
+        Properties properties = new Properties();
+        properties.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
+        return properties;
     }
 }

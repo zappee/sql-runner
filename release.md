@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
 #### Added
 - Initial version based on the requirements
 
-### [x.y.z] - yyyy-mm-dd
+### [0.2.0] - yyyy-mm-dd
 #### Added
-#### Changed
-#### removed
+- set timeout to 60 sec whiile trying to connect to the database
