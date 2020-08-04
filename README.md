@@ -1,9 +1,13 @@
-# TODO: this content needs to be updated and finished 
+# Remal SQL-Runner command line tool
 
-> [Release Note](release.md)
+_keywords: java, sql, query, insert, select, update, oracle, database, bash script, shell script, command line,  tool, execute, automate, docker_
+
+_[Release Note](release.md)_
 
 ## 1) Overview
-The tool can be used from Windows/Linux script files.
+The SQL-Runner is a flexible command line Java tool can be used to run any SQL commands using bash script and command line. It can be used very effectively from Windows/Linux script files.
+
+The latest version of the tool only supports Oracle Database server, but it can support different SQL dialects as well.
 
 ## 2) Use cases
 #### 2.1) Database status check
@@ -11,13 +15,12 @@ A possible use case in Docker environment is to check whether the database serve
 ~~~
 #!/bin/bash
 
-until java -jar sql-runner-1.0-with-dependencies.jar -j jdbc:oracle:thin:@//oracle-db:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P Oradoc_db1 "select 1 from dual"
+until java -jar sql-runner-0.2.0-with-dependencies.jar -j jdbc:oracle:thin:@//oracle-db:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P Oradoc_db1 "select 1 from dual"
 do
     echo "The database server in not up and running. Waiting..."
-    # sleep 0.5
+    sleep 0.5
 done
-
-echo ok
+echo "Database server is up and running"
 ~~~
 
 ## 3) Usage
@@ -50,11 +53,15 @@ Provide a JDBC URL:
   -j, --jdbcUrl=<jdbcUrl>   JDBC URL, example: jdbc:oracle:<drivertype>:@//<host>:<port>/<database>.
 
 Exit codes:
-  1   Successful program execution.
-  2   An unexpected error appeared while executing the SQL statement.
-  3   Usage error. User input for the command was incorrect.
+  0   Successful program execution.
+  1   An unexpected error appeared while executing the SQL statement.
+  2   Usage error. User input for the command was incorrect.
+
+Please report issues at arnold.somogyi@gmail.com.
+Documentation, source code: https://github.com/zappee/sql-runner.git
 ~~~~
 
-## 4) Examples
-* `java -jar target/sql-runner-1.0-with-dependencies.jar -j jdbc:oracle:thin:@//localhost:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SCHEMA.TABLE"`
-* `java -jar target/sql-runner-1.0-with-dependencies.jar -h localhost -p 1521 -d ORCLPDB1.localdomain -U "SYS as SYSDBA" -P "Oradoc_db1" "select * from SCHEMA.TABLE"`
+## 4) Licence
+BSD (2-clause) licensed.
+
+

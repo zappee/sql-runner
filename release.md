@@ -9,10 +9,4 @@ All notable changes to this project will be documented in this file.
 
 ### [0.2.0] - yyyy-mm-dd
 #### Added
-- `-t, --timeout:` a new command line parameter
-#### Changed
-#### Removed
-
-#### Added
-#### Changed
-#### Removed
+- set timeout to 60 sec whiile trying to connect to the database
