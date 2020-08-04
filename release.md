@@ -7,10 +7,10 @@ All notable changes to this project will be documented in this file.
 #### Added
 - Initial version based on the requirements
 
-### [0.2.0] - yyyy-mm-dd
+### [0.2.0] - 2020-Jul-23
 #### Added
 - set timeout to 60 sec while trying to connect to the database
 
-### [0.2.1] - 2020-08-04
+### [0.2.1] - 2020-Aug-04
 #### Added
 - set timeout to 60 sec while trying to connect to the database
