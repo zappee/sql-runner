@@ -24,6 +24,8 @@ import oracle.jdbc.driver.OracleConnection;
  */
 public class SqlStatementExecutor {
 
+    private static final int ONE_SECOND_IN_MILLISEC = 1000;
+
     private PrintStream out = System.out;
     private boolean verbose = false;
     private boolean showHeader = false;
@@ -121,31 +123,27 @@ public class SqlStatementExecutor {
             out.println("getting connection to " + jdbcUrl + "...");
         }
 
-        String timeout = "1000";
-        Properties properties = new Properties();
-        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_NET_CONNECT_TIMEOUT, timeout);
-        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_READ_TIMEOUT, timeout);
-        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_JNDI_LDAP_CONNECT_TIMEOUT, timeout);
-        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_JNDI_LDAP_READ_TIMEOUT, timeout);
-        properties.put(OracleConnection.CONNECTION_PROPERTY_THIN_OUTBOUND_CONNECT_TIMEOUT, timeout);
-        properties.put(OracleConnection.CONNECTION_PROPERTY_DOWN_HOSTS_TIMEOUT, timeout);
-        properties.put("oracle.jdbc.ReadTimeout", timeout);
-        properties.put("oracle.net.CONNECT_TIMEOUT", timeout);
+        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLISEC / 1000);
 
-        properties.put (OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
-        properties.put (OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
-
-        System.setProperty("oracle.net.READ_TIMEOUT", timeout);
-        System.setProperty("oracle.jdbc.ReadTimeout", timeout);
-        System.setProperty("oracle.jdbc.javaNetNio", "true");
-
-        System.setProperty("sun.net.client.defaultReadTimeout", timeout);
-        System.setProperty("sun.net.client.defaultConnectTimeout", timeout);
-
-        DriverManager.setLoginTimeout(Integer.valueOf(timeout));
+        Properties properties = getConnectionArguments(user, password);
         Connection connection = DriverManager.getConnection(jdbcUrl, properties);
-        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), Integer.valueOf(timeout));
+        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLISEC);
 
         return connection;
+    }
+
+    /**
+     * Build a list of arbitrary string tag/value pairs as connection arguments.
+     * Normally at least a "user" and "password" property should be included.
+     *
+     * @param user username
+     * @param password password
+     * @return connection argument list
+     */
+    private Properties getConnectionArguments(String user, String password) {
+        Properties properties = new Properties();
+        properties.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
+        properties.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
+        return properties;
     }
 }
