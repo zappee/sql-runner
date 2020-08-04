@@ -65,3 +65,11 @@ Documentation, source code: https://github.com/zappee/sql-runner.git
 BSD (2-clause) licensed.
 
 
+jdbcsql is a small command-line tool written in JAVA and can be used on all platforms, for which JRE 8 is available.
+Relatively easy to configurate, this tool is suitable for queries ‘select’, ‘update’ and ‘delete’.
+To connect to a specific DBMS the tool uses its JDBC driver.
+Other dialect can easily be added by the user.
+
+The result of the executed 'select' query is displayed on the standard output.
+When there is an error the tool stops with exit code 1 and the error message is output on stderr.
+jdbcsql is created with a main purpose to be used in shell-scripts. 
