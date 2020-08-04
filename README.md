@@ -5,7 +5,7 @@ _keywords: java, sql, query, insert, select, update, oracle, database, bash scri
 _[Release Note](release.md)_
 
 ## 1) Overview
-The SQL-Runner is a flexible command line Java tool can be used to run any SQL commands using bash script and command line. It can be used very effectively from Windows/Linux script files.
+The SQL-Runner is a flexible command-line Java tool that can be used to run any SQL commands using bash script and command line. It can be used very effectively from Windows/Linux script files.
 
 The latest version of the tool only supports Oracle Database server, but it can support different SQL dialects as well.
 
@@ -27,7 +27,7 @@ echo "Database server is up and running"
 ~~~~
 Usage: SqlRunner [-?sv] [-c=<dialect>] -U=<user> (-P=<password> | -I) (-j=<jdbcUrl> | (-h=<host>
                  -p=<port> -d=<database>)) <sql>
-SQL command line tool. It executes the given SQL and show the result on the standard output.
+SQL command line tool. It executes the given SQL and shows the result on the standard output.
 
 General options:
       <sql>                 SQL to be executed. Example: 'select 1 from dual'
@@ -55,7 +55,7 @@ Provide a JDBC URL:
 Exit codes:
   0   Successful program execution.
   1   An unexpected error appeared while executing the SQL statement.
-  2   Usage error. User input for the command was incorrect.
+  2   Usage error. The user input for the command was incorrect.
 
 Please report issues at arnold.somogyi@gmail.com.
 Documentation, source code: https://github.com/zappee/sql-runner.git

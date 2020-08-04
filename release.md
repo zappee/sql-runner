@@ -9,4 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### [0.2.0] - yyyy-mm-dd
 #### Added
-- set timeout to 60 sec whiile trying to connect to the database
+- set timeout to 60 sec while trying to connect to the database
+
+### [0.2.1] - 2020-08-04
+#### Added
+- set timeout to 60 sec while trying to connect to the database

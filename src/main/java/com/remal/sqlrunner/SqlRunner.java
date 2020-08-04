@@ -24,14 +24,14 @@ import picocli.CommandLine.Parameters;
 @Command(name = "SqlRunner",
         sortOptions = false,
         usageHelpWidth = 100,
-        description = "SQL command line tool. It executes the given SQL and show the result on the standard output.%n",
+        description = "SQL command line tool. It executes the given SQL and shows the result on the standard output.%n",
         parameterListHeading = "General options:%n",
         exitCodeListHeading = "%nExit codes:%n",
         exitCodeOnUsageHelp = ExitCode.CLI_ERROR_EXIT_CODE,
         exitCodeList = {
                 "0:Successful program execution.",
                 "1:An unexpected error appeared while executing the SQL statement.",
-                "2:Usage error. User input for the command was incorrect." },
+                "2:Usage error. The user input for the command was incorrect." },
         footerHeading = "%nPlease report issues at arnold.somogyi@gmail.com.",
         footer = "%nDocumentation, source code: https://github.com/zappee/sql-runner.git")
 public class SqlRunner implements Callable<Integer> {
