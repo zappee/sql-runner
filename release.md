@@ -14,3 +14,8 @@ All notable changes to this project will be documented in this file.
 ### [0.2.1] - 2020-Aug-04
 #### Added
 - add binary JAR to the release
+
+### [0.2.2] - 2020-MMM-dd
+#### Changed
+- improvement in error handling while connecting to the database
+- improvement in documentation
