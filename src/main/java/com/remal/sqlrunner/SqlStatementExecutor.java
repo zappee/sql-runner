@@ -65,6 +65,7 @@ public class SqlStatementExecutor {
         } catch (SQLException e) {
             out.println("ERROR: An error occurred while executing the sql statement.");
             out.println("Details: " + e.getMessage());
+            out.println("SQL: " + sql);
             return ExitCode.SQL_EXECUTION_ERROR;
         }
     }
