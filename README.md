@@ -5,9 +5,17 @@ _keywords: java, sql, query, insert, select, update, oracle, database, bash scri
 _[Release Note](release.md)_
 
 ## 1) Overview
-The SQL-Runner is a flexible command-line Java tool that can be used to run any SQL commands using bash script and command line. It can be used very effectively from Windows/Linux script files.
 
-The latest version of the tool only supports Oracle Database server, but it can support different SQL dialects as well.
+The `SQL-Runner` is a small command-line tool written in Java and can be used on all platforms, for which JRE 8 is available.
+The tool can be used to execute any SQL commands, especially it is suitable for executing SQL `select`, `update` and `delete`.
+You can use it to `insert` data into databases as well, but I think this is not the most effective way to do this.
+The tool uses a JDBC driver to connect to a specific database and relatively easy to configure.
+The latest version of the tool only supports Oracle Database server, but other SQL dialects can easily be added.
+
+The result of the executed SQL command is displayed on the standard output.
+When there is an error the tool stops with exit code 1 or 2 and the error message is displayed.
+
+SQL-Runner is created with a main purpose to be used in Linux shell-scripts or in Windows command line. 
 
 ## 2) Use cases
 #### 2.1) Database status check
@@ -63,13 +71,3 @@ Documentation, source code: https://github.com/zappee/sql-runner.git
 
 ## 4) Licence
 BSD (2-clause) licensed.
-
-
-jdbcsql is a small command-line tool written in JAVA and can be used on all platforms, for which JRE 8 is available.
-Relatively easy to configurate, this tool is suitable for queries ‘select’, ‘update’ and ‘delete’.
-To connect to a specific DBMS the tool uses its JDBC driver.
-Other dialect can easily be added by the user.
-
-The result of the executed 'select' query is displayed on the standard output.
-When there is an error the tool stops with exit code 1 and the error message is output on stderr.
-jdbcsql is created with a main purpose to be used in shell-scripts. 
