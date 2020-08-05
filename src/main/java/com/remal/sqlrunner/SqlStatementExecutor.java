@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
-import oracle.jdbc.driver.OracleConnection;
+import oracle.jdbc.OracleConnection;
 
 /**
  * This class connects to the database and executes the provided SQL statement.
@@ -63,8 +63,9 @@ public class SqlStatementExecutor {
             return ExitCode.OK;
 
         } catch (SQLException e) {
-            out.println(e.getMessage());
-            return ExitCode.SQL_ERROR;
+            out.println("ERROR: An error occurred while executing the sql statement.");
+            out.println("Details: " + e.getMessage());
+            return ExitCode.SQL_EXECUTION_ERROR;
         }
     }
 

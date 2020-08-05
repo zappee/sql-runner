@@ -25,14 +25,14 @@ public enum ExitCode {
     /**
      * Used if an unexpected error appeared while executing the SQL statement.
      */
-    SQL_ERROR(ExitCode.SQL_ERROR_EXIT_CODE);
+    SQL_EXECUTION_ERROR(ExitCode.SQL_EXECUTION_ERROR_EXIT_CODE);
 
     /**
      * Exit codes constants.
      */
     public static final int OK_EXIT_CODE = 0;
     public static final int CLI_ERROR_EXIT_CODE = 1;
-    public static final int SQL_ERROR_EXIT_CODE = 2;
+    public static final int SQL_EXECUTION_ERROR_EXIT_CODE = 2;
 
 
     private int exitCodeRepresentation;

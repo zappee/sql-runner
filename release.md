@@ -17,5 +17,5 @@ All notable changes to this project will be documented in this file.
 
 ### [0.2.2] - 2020-MMM-dd
 #### Changed
-- improvement in error handling while connecting to the database
+- improvement in error handling and how the error message is displayed
 - improvement in documentation
