@@ -44,6 +44,19 @@ public class SqlStatementExecutor {
     }
 
     /**
+     * Set the standard output where the application writes logs.
+     *
+     * @param user name for the login
+     * @param password password for the connecting user
+     * @param out the output writer
+     */
+    public SqlStatementExecutor(String user, String password, PrintStream out) {
+        this.user = user;
+        this.password = password;
+        this.out = out;
+    }
+
+    /**
      * Executes the given SQL statement and returns with the result as a string.
      *
      * @param jdbcUrl the JDBC URL
@@ -102,15 +115,6 @@ public class SqlStatementExecutor {
      */
     public void setShowHeader(boolean showHeader) {
         this.showHeader = showHeader;
-    }
-
-    /**
-     * Set the standard output where the application writes logs.
-     *
-     * @param out the output writer
-     */
-    public SqlStatementExecutor(PrintStream out) {
-        this.out = out;
     }
 
     /**
