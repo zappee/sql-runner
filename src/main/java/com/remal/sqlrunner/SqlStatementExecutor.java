@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import com.remal.sqlrunner.util.AnsiColor;
 import oracle.jdbc.OracleConnection;
 
 /**
@@ -29,7 +30,10 @@ public class SqlStatementExecutor {
     /**
      * Error message template.
      */
-    private static final String ERROR_MESSAGE = AnsiColor.RED_BOLD_BRIGHT + "ERROR: An error occurred while executing the sql statement.%n%s%n%s" + AnsiColor.DEFAULT;
+    private static final String ERROR_MESSAGE =
+            AnsiColor.RED_BOLD_BRIGHT
+            + "ERROR: An error occurred while executing the sql statement.%n%s%n%s"
+            + AnsiColor.DEFAULT;
 
     private PrintStream out = System.out;
     private boolean verbose = false;
@@ -82,7 +86,7 @@ public class SqlStatementExecutor {
         } catch (SQLException e) {
             String errorMessage = String.format(ERROR_MESSAGE, e.toString(), sql);
             out.println(errorMessage);
-            exitCode = ExitCode.SQL_ERROR;
+            exitCode = ExitCode.SQL_EXECUTION_ERROR;
         } finally {
             showExitCode(exitCode);
         }
@@ -145,11 +149,11 @@ public class SqlStatementExecutor {
             out.println("getting connection to " + jdbcUrl + "...");
         }
 
-        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLISEC / 1000);
+        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLI / 1000);
 
         Properties properties = getConnectionArguments(user, password);
         Connection connection = DriverManager.getConnection(jdbcUrl, properties);
-        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLISEC);
+        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLI);
 
         return connection;
     }
@@ -167,5 +171,30 @@ public class SqlStatementExecutor {
         properties.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
         properties.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
         return properties;
+    }
+
+    /**
+     * Show the exit code of the application.
+     *
+     * @param exitCode the exit code
+     */
+    private void showExitCode(ExitCode exitCode) {
+        String color;
+        switch (exitCode) {
+            case OK:
+                color = AnsiColor.GREEN_BOLD_BRIGHT;
+                break;
+
+            case SQL_EXECUTION_ERROR:
+            case CLI_ERROR:
+                color = AnsiColor.RED_BOLD_BRIGHT;
+                break;
+
+            default: color = AnsiColor.DEFAULT;
+        }
+
+        out.printf("%sReturn code: %d", color, exitCode.getExitCode());
+        out.printf(AnsiColor.DEFAULT);
+        out.printf("%n%n");
     }
 }
