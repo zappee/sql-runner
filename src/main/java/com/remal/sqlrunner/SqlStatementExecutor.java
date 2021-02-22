@@ -32,7 +32,7 @@ public class SqlStatementExecutor {
      */
     private static final String ERROR_MESSAGE =
             AnsiColor.RED_BOLD_BRIGHT
-            + "ERROR: An error occurred while executing the sql statement.%n%s%n%s"
+            + "ERROR: An error occurred while executing the sql statement.%n%s%nSQL: %s"
             + AnsiColor.DEFAULT;
 
     private PrintStream out = System.out;
