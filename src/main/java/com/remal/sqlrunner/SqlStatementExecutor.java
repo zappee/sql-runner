@@ -24,7 +24,12 @@ import oracle.jdbc.OracleConnection;
  */
 public class SqlStatementExecutor {
 
-    private static final int ONE_SECOND_IN_MILLISEC = 1000;
+    private static final int ONE_SECOND_IN_MILLI = 1000;
+
+    /**
+     * Error message template.
+     */
+    private static final String ERROR_MESSAGE = AnsiColor.RED_BOLD_BRIGHT + "ERROR: An error occurred while executing the sql statement.%n%s%n%s" + AnsiColor.DEFAULT;
 
     private PrintStream out = System.out;
     private boolean verbose = false;
@@ -64,6 +69,7 @@ public class SqlStatementExecutor {
      * @return 0 if the SQL statement was executed properly, otherwise 1
      */
     public ExitCode execute(String jdbcUrl, String sql) {
+        ExitCode exitCode = ExitCode.OK;
         try (Connection connection = getConnection(jdbcUrl);
              Statement statement = connection.createStatement()) {
 
@@ -73,14 +79,15 @@ public class SqlStatementExecutor {
 
             ResultSet resultSet = statement.executeQuery(sql);
             out.println(ResultSetConverter.toString(resultSet, showHeader));
-            return ExitCode.OK;
-
         } catch (SQLException e) {
-            out.println("ERROR: An error occurred while executing the sql statement.");
-            out.println(e.getMessage());
-            out.println("SQL: " + sql);
-            return ExitCode.SQL_EXECUTION_ERROR;
+            String errorMessage = String.format(ERROR_MESSAGE, e.toString(), sql);
+            out.println(errorMessage);
+            exitCode = ExitCode.SQL_ERROR;
+        } finally {
+            showExitCode(exitCode);
         }
+
+        return exitCode;
     }
 
     /**
@@ -106,6 +113,15 @@ public class SqlStatementExecutor {
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+
+    /**
+     * Set the standard output stream where the application sends the log messages.
+     *
+     * @param out the output where the application prints log messages
+     */
+    public void setStandardOutput(PrintStream out) {
+        this.out = out;
     }
 
     /**

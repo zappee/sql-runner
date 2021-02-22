@@ -15,7 +15,10 @@ All notable changes to this project will be documented in this file.
 #### Added
 - add binary JAR to the release
 
-### [0.2.2] - 2020-MMM-dd
+### [0.2.2] - 2021-Feb-22
+#### Added
+- show exit code on the standard output
+- new command line option: quiet mode
 #### Changed
 - improvement in error handling and how the error message is displayed
 - improvement in documentation
