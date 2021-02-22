@@ -104,6 +104,15 @@ public class SqlStatementExecutor {
     }
 
     /**
+     * Set the standard output stream where the application sends the log messages.
+     *
+     * @param out the output where the application prints log messages
+     */
+    public void setStandardOutput(PrintStream out) {
+        this.out = out;
+    }
+
+    /**
      * Flag to control whether the name of the fields from the SQL result set is displayed or not.
      *
      * @param showHeader value of the flag
@@ -156,7 +165,6 @@ public class SqlStatementExecutor {
         properties.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
         return properties;
     }
-
 
     /**
      * Show the exit code of the application.

@@ -8,6 +8,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
@@ -47,6 +49,10 @@ public class SqlRunner implements Callable<Integer> {
     @Option(names = {"-v", "--verbose"},
             description = "It provides additional details as to what the tool is doing.")
     private boolean verbose;
+
+    @Option(names = {"-q", "--quiet"},
+            description = "In this mode nothing will be printed to the output.")
+    private boolean quiet;
 
     @Option(names = {"-c", "--dialect"},
             defaultValue = Dialect.ORACLE_VALUE,
@@ -167,6 +173,15 @@ public class SqlRunner implements Callable<Integer> {
             executor = new SqlStatementExecutor(user, passwordArgGroup.password);
         } else {
             executor = new SqlStatementExecutor(user, passwordArgGroup.interactivePassword);
+        }
+
+        // do not show anything in quiet mode
+        if (quiet) {
+            executor.setStandardOutput(new PrintStream(new OutputStream() {
+                public void write(int b) {
+                    // do nothing
+                }
+            }));
         }
 
         executor.setVerbose(verbose);

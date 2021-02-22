@@ -33,6 +33,7 @@ General options:
       <sql>                 SQL to be executed. Example: 'select 1 from dual'
   -?, --help                Display this help and exit.
   -v, --verbose             It provides additional details as to what the tool is doing.
+  -q, --quiet               In this mode nothing will be printed to the output.
   -c, --dialect=<dialect>   SQL dialect used during the execution of the SQL statement. Supported
                               SQL dialects: ORACLE.
                               Default: ORACLE
