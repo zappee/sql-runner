@@ -1,8 +1,5 @@
 package com.remal.sqlrunner;
 
-import java.util.Objects;
-import java.util.concurrent.Callable;
-
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
 import picocli.CommandLine;
@@ -10,6 +7,9 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * SQL command-line tool.

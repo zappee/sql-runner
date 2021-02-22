@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import com.remal.sqlrunner.util.AnsiColor;
 import oracle.jdbc.driver.OracleConnection;
 
 /**
@@ -24,7 +25,12 @@ import oracle.jdbc.driver.OracleConnection;
  */
 public class SqlStatementExecutor {
 
-    private static final int ONE_SECOND_IN_MILLISEC = 1000;
+    private static final int ONE_SECOND_IN_MILLI = 1000;
+
+    /**
+     * Error message template.
+     */
+    private static final String ERROR_MESSAGE = AnsiColor.RED_BOLD_BRIGHT + "%nERROR: %s" + AnsiColor.DEFAULT;
 
     private PrintStream out = System.out;
     private boolean verbose = false;
@@ -51,6 +57,7 @@ public class SqlStatementExecutor {
      * @return 0 if the SQL statement was executed properly, otherwise 1
      */
     public ExitCode execute(String jdbcUrl, String sql) {
+        ExitCode exitCode = ExitCode.OK;
         try (Connection connection = getConnection(jdbcUrl);
              Statement statement = connection.createStatement()) {
 
@@ -60,12 +67,15 @@ public class SqlStatementExecutor {
 
             ResultSet resultSet = statement.executeQuery(sql);
             out.println(ResultSetConverter.toString(resultSet, showHeader));
-            return ExitCode.OK;
-
         } catch (SQLException e) {
-            out.println(e.getMessage());
-            return ExitCode.SQL_ERROR;
+            String errorMessage = String.format(ERROR_MESSAGE, e.toString());
+            out.println(errorMessage);
+            exitCode = ExitCode.SQL_ERROR;
+        } finally {
+            showExitCode(exitCode);
         }
+
+        return exitCode;
     }
 
     /**
@@ -123,11 +133,11 @@ public class SqlStatementExecutor {
             out.println("getting connection to " + jdbcUrl + "...");
         }
 
-        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLISEC / 1000);
+        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLI / 1000);
 
         Properties properties = getConnectionArguments(user, password);
         Connection connection = DriverManager.getConnection(jdbcUrl, properties);
-        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLISEC);
+        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLI);
 
         return connection;
     }
@@ -145,5 +155,31 @@ public class SqlStatementExecutor {
         properties.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, user);
         properties.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, password);
         return properties;
+    }
+
+
+    /**
+     * Show the exit code of the application.
+     *
+     * @param exitCode the exit code
+     */
+    private void showExitCode(ExitCode exitCode) {
+        String color;
+        switch (exitCode) {
+            case OK:
+                color = AnsiColor.GREEN_BOLD_BRIGHT;
+                break;
+
+            case SQL_ERROR:
+            case CLI_ERROR:
+                color = AnsiColor.RED_BOLD_BRIGHT;
+                break;
+
+            default: color = AnsiColor.DEFAULT;
+        }
+
+        out.printf("%sReturn code: %d", color, exitCode.getExitCode());
+        out.printf(AnsiColor.DEFAULT);
+        out.printf("%n%n");
     }
 }

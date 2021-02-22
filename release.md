@@ -14,3 +14,7 @@ All notable changes to this project will be documented in this file.
 ### [0.2.1] - 2020-Aug-04
 #### Added
 - add binary JAR to the release
+
+### [0.2.2] - 2021-Feb-22
+#### Added
+- show exit code on the standard output
