@@ -147,6 +147,7 @@ public class SqlStatementExecutor {
     private Connection getConnection(String jdbcUrl) throws SQLException {
         if (verbose) {
             out.println("getting connection to " + jdbcUrl + "...");
+            out.println(String.format("using '%s' as the username", user));
         }
 
         DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLI / 1000);
