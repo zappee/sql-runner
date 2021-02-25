@@ -3,6 +3,7 @@ package com.remal.sqlrunner;
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
 import com.remal.sqlrunner.domain.SqlCommandSeparator;
+import com.remal.sqlrunner.util.SqlCommandsParser;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -61,8 +62,10 @@ public class SqlRunner implements Callable<Integer> {
     @Option(names = {"-e", "--cmdsep"},
             defaultValue = SqlCommandSeparator.SEMICOLON_VALUE,
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
-            description = "SQL command separator, used for separate multiply SQL commands.")
-    private Dialect sqlCommandSeparator;
+            description = "SQL separator is a non-alphanumeric character used to separate multiple SQL statements. "
+                    + "Multiply statements is only recommended for SQL INSERT and UPDATE because in this case the "
+                    + "result of the queries will not be displayed. ")
+    private String sqlCommandSeparator;
 
     @Option(names = {"-s", "--showHeader"},
             description = "Shows the name of the fields from the SQL result set.")
@@ -128,8 +131,9 @@ public class SqlRunner implements Callable<Integer> {
      */
     @Parameters(index = "0",
             arity = "1",
-            description = "SQL to be executed. Example: 'select 1 from dual'")
-    private String sql;
+            description = "SQL statements to be executed. Multiply statements can be provided. "
+                    + "Example: 'insert into...; insert into ...; commit'")
+    private String sqlStatements;
 
     /**
      * Custom connection parameters.
@@ -153,17 +157,6 @@ public class SqlRunner implements Callable<Integer> {
     }
 
     /**
-     * The entry point of the executable JAR.
-     *
-     * @param args command line parameters
-     */
-    public static void main(String[] args) {
-        CommandLine cmd = new CommandLine(new SqlRunner());
-        int exitCode = cmd.execute(args);
-        System.exit(exitCode);
-    }
-
-    /**
      * It is used to create a thread.
      *
      * @return exit code
@@ -180,28 +173,49 @@ public class SqlRunner implements Callable<Integer> {
 
         // do not show anything in quiet mode
         if (quiet) {
-            executor.setStandardOutput(new PrintStream(new OutputStream() {
-                public void write(int b) {
-                    // do nothing
-                }
-            }));
+            executor.setStandardOutput(getDevNullPrintStream());
         }
 
         executor.setVerbose(verbose);
         executor.setShowHeader(showHeader);
+        executor.setSqlStatements(SqlCommandsParser.parse(sqlStatements, sqlCommandSeparator));
 
         // execute the SQL statement and print the resut to the standard output
         if (Objects.nonNull(mainArgGroup.jdbcUrl)) {
-            return executor.execute(mainArgGroup.jdbcUrl, sql).getExitCode();
+            return executor.execute(mainArgGroup.jdbcUrl).getExitCode();
         } else {
             return executor
                     .execute(
                             dialect,
                             mainArgGroup.customConfigurationGroup.host,
                             mainArgGroup.customConfigurationGroup.port,
-                            mainArgGroup.customConfigurationGroup.database,
-                            sql)
+                            mainArgGroup.customConfigurationGroup.database)
                     .getExitCode();
         }
+    }
+
+    /**
+     * The entry point of the executable JAR.
+     *
+     * @param args command line parameters
+     */
+    public static void main(String[] args) {
+        CommandLine cmd = new CommandLine(new SqlRunner());
+        int exitCode = cmd.execute(args);
+        System.exit(exitCode);
+    }
+
+    /**
+     * This is a replacement of the standard Java System.out stream.
+     * This will print everything to dev/null. Used in quiet mode.
+     *
+     * @return the print stream instance
+     */
+    private PrintStream getDevNullPrintStream() {
+        return new PrintStream(new OutputStream() {
+            public void write(int b) {
+                // do nothing
+            }
+        });
     }
 }

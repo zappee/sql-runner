@@ -6,11 +6,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import com.remal.sqlrunner.domain.SqlCommandSeparator;
 import com.remal.sqlrunner.util.AnsiColor;
 import oracle.jdbc.OracleConnection;
 
@@ -28,7 +30,7 @@ public class SqlStatementExecutor {
      */
     private static final String ERROR_MESSAGE =
             AnsiColor.RED_BOLD_BRIGHT
-            + "ERROR: An error occurred while executing the sql statement.%n%s%nSQL: %s"
+            + "ERROR: An error occurred while executing the sql statement.%n%s%nSQL(s): %s"
             + AnsiColor.DEFAULT;
 
     private PrintStream out = System.out;
@@ -36,6 +38,7 @@ public class SqlStatementExecutor {
     private boolean showHeader = false;
     private String user;
     private String password;
+    private List<String> sqlStatements;
 
     /**
      * Initialization method.
@@ -65,22 +68,29 @@ public class SqlStatementExecutor {
      * Executes the given SQL statement and returns with the result as a string.
      *
      * @param jdbcUrl the JDBC URL
-     * @param sql sql statement to be executed
      * @return 0 if the SQL statement was executed properly, otherwise 1
      */
-    public ExitCode execute(String jdbcUrl, String sql) {
+    public ExitCode execute(String jdbcUrl) {
         ExitCode exitCode = ExitCode.OK;
         try (Connection connection = getConnection(jdbcUrl);
              Statement statement = connection.createStatement()) {
 
             if (verbose) {
-                out.println("executing SQL statement: " + sql + "...");
+                out.println("executing SQL statement: " + sqlStatementsToString() + "...");
             }
 
-            ResultSet resultSet = statement.executeQuery(sql);
-            out.println(ResultSetConverter.toString(resultSet, showHeader));
+            // SQL statement list never empty, Picoli checks it
+            if (sqlStatements.size() == 1) {
+                ResultSet resultSet = statement.executeQuery(sqlStatements.get(0));
+                out.println(ResultSetConverter.toString(resultSet, showHeader));
+            } else {
+                for (String sql : sqlStatements) {
+                    statement.addBatch(sql);
+                }
+                statement.executeBatch();
+            }
         } catch (SQLException e) {
-            String errorMessage = String.format(ERROR_MESSAGE, e.toString(), sql);
+            String errorMessage = String.format(ERROR_MESSAGE, e.toString(), sqlStatementsToString());
             out.println(errorMessage);
             exitCode = ExitCode.SQL_EXECUTION_ERROR;
         } finally {
@@ -97,12 +107,11 @@ public class SqlStatementExecutor {
      * @param host name of the database server
      * @param port number of the port where the server listens for requests
      * @param database name of the particular database on the server, lso known as the SID in Oracle terminology
-     * @param sql sql statement to be executed
      * @return 0 if the SQL statement was executed properly, otherwise 1
      */
-    public ExitCode execute(Dialect dialect, String host, int port, String database, String sql) {
+    public ExitCode execute(Dialect dialect, String host, int port, String database) {
         String jdbcUrl = dialect.getJdbcUrl(host, port, database);
-        return execute(jdbcUrl, sql);
+        return execute(jdbcUrl);
     }
 
     /**
@@ -131,6 +140,15 @@ public class SqlStatementExecutor {
      */
     public void setShowHeader(boolean showHeader) {
         this.showHeader = showHeader;
+    }
+
+    /**
+     * SQL statements to be executed.
+     *
+     * @param sqlStatements the sql statements
+     */
+    public void setSqlStatements(List<String> sqlStatements) {
+        this.sqlStatements = sqlStatements;
     }
 
     /**
@@ -193,5 +211,21 @@ public class SqlStatementExecutor {
         out.printf("%sReturn code: %d", color, exitCode.getExitCode());
         out.printf(AnsiColor.DEFAULT);
         out.printf("%n%n");
+    }
+
+    /**
+     * Prints the sql statements in one line..
+     *
+     * @return the string representation of the SQL statements
+     */
+    private String sqlStatementsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (String sql : sqlStatements) {
+            if (sb.length() > 0) {
+                sb.append(SqlCommandSeparator.SEMICOLON.getValue()).append(" ");
+            }
+            sb.append(sql);
+        }
+        return sb.toString();
     }
 }

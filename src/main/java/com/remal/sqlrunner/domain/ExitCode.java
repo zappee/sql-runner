@@ -24,10 +24,18 @@ public enum ExitCode {
     SQL_EXECUTION_ERROR(ExitCode.SQL_EXECUTION_ERROR_EXIT_CODE);
 
     /**
-     * Exit codes constants.
+     * Used when there was no error during the execution of the SQL statements.
      */
     public static final int OK_EXIT_CODE = 0;
+
+    /**
+     * Used when the provided command line parameters was not correct.
+     */
     public static final int CLI_ERROR_EXIT_CODE = 1;
+
+    /**
+     * Used when an error appeared while executing the SQL statements.
+     */
     public static final int SQL_EXECUTION_ERROR_EXIT_CODE = 2;
 
 
