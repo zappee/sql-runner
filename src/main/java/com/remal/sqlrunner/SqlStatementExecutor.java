@@ -1,20 +1,15 @@
 package com.remal.sqlrunner;
 
-import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
 import com.remal.sqlrunner.domain.SqlCommandSeparator;
 import com.remal.sqlrunner.util.AnsiColor;
 import oracle.jdbc.OracleConnection;
+
+import java.io.PrintStream;
+import java.sql.*;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This class connects to the database and executes the provided SQL statement.
@@ -22,8 +17,6 @@ import oracle.jdbc.OracleConnection;
  * @author arnold.somogyi@gmail.com
  */
 public class SqlStatementExecutor {
-
-    private static final int ONE_SECOND_IN_MILLI = 1000;
 
     /**
      * Error message template.
@@ -164,11 +157,8 @@ public class SqlStatementExecutor {
             out.println(String.format("using '%s' as the username", user));
         }
 
-        DriverManager.setLoginTimeout(ONE_SECOND_IN_MILLI / 1000);
-
         Properties properties = getConnectionArguments(user, password);
         Connection connection = DriverManager.getConnection(jdbcUrl, properties);
-        connection.setNetworkTimeout(Executors.newSingleThreadExecutor(), ONE_SECOND_IN_MILLI);
 
         return connection;
     }
