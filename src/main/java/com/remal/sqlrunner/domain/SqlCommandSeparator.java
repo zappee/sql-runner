@@ -1,12 +1,13 @@
 package com.remal.sqlrunner.domain;
 
 /**
- * SQL separator is a non-alphanumeric character used to separate multiple
- * SQL commands provided by the user.
- * <p></p>
- * E.g.: java -jar sql-runner.jar options "INSERT INTO user VALUES('katalin'); \
- *                                         INSERT INTO user VALUES('arnold'); \
- *                                         COMMIT"
+ * <p>SQL separator is a non-alphanumeric character used to separate multiple
+ * SQL commands provided by the user.</p>
+ *
+ * <p>E.g.: java -jar sql-runner.jar options
+ *                                   "INSERT INTO user VALUES('katalin'); \
+ *                                    INSERT INTO user VALUES('arnold'); \
+ *                                    COMMIT"</p>
  *
  * @author arnold.somogyi@gmail.com
  */

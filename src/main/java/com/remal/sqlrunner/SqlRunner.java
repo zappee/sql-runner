@@ -3,6 +3,7 @@ package com.remal.sqlrunner;
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
 import com.remal.sqlrunner.domain.SqlCommandSeparator;
+import com.remal.sqlrunner.picocli.CustomOptionRenderer;
 import com.remal.sqlrunner.util.SqlCommandsParser;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
@@ -201,6 +202,7 @@ public class SqlRunner implements Callable<Integer> {
      */
     public static void main(String[] args) {
         CommandLine cmd = new CommandLine(new SqlRunner());
+        cmd.setHelpFactory(new CustomOptionRenderer());
         int exitCode = cmd.execute(args);
         System.exit(exitCode);
     }
