@@ -2,6 +2,7 @@ package com.remal.sqlrunner;
 
 import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
+import com.remal.sqlrunner.domain.SqlCommandSeparator;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -16,10 +17,6 @@ import java.util.concurrent.Callable;
 /**
  * SQL command-line tool.
  * The tool executes the given SQL and shows the result on the standard output.
- *
- * <p>
- * created on 09/07/2020
- * </p>
  *
  * @author arnold.somogyi@gmail.com
  */
@@ -60,6 +57,12 @@ public class SqlRunner implements Callable<Integer> {
             description = "SQL dialect used during the execution of the SQL statement. "
                     + "Supported SQL dialects: ${COMPLETION-CANDIDATES}.")
     private Dialect dialect;
+
+    @Option(names = {"-e", "--cmdsep"},
+            defaultValue = SqlCommandSeparator.SEMICOLON_VALUE,
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
+            description = "SQL command separator, used for separate multiply SQL commands.")
+    private Dialect sqlCommandSeparator;
 
     @Option(names = {"-s", "--showHeader"},
             description = "Shows the name of the fields from the SQL result set.")

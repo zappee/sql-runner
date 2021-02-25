@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 #### Added
 - show exit code on the standard output
 - new command line option: quiet mode
+- possibility to execute multiply SQL statement, see the `cmds`
 #### Changed
 - improvement in error handling and how the error message is displayed
 - improvement in documentation
