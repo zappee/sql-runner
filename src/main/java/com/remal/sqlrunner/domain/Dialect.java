@@ -5,10 +5,6 @@ import picocli.CommandLine.Command;
 /**
  * Supported SQL dialects.
  *
- * <p>
- * created on 10/07/2020
- * </p>
- *
  * @author arnold.somogyi@gmail.com
  */
 @Command
@@ -20,6 +16,7 @@ public enum Dialect {
      * String representation of the enum item.
      */
     public static final String ORACLE_VALUE = "ORACLE";
+
     private String value;
     private String jdbcUrlTemplate;
 

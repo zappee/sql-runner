@@ -17,10 +17,6 @@ import oracle.jdbc.OracleConnection;
 /**
  * This class connects to the database and executes the provided SQL statement.
  *
- * <p>
- * created on 09/07/2020
- * </p>
- *
  * @author arnold.somogyi@gmail.com
  */
 public class SqlStatementExecutor {

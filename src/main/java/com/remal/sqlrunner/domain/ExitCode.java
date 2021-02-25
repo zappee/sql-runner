@@ -3,10 +3,6 @@ package com.remal.sqlrunner.domain;
 /**
  * List of the exit codes of the application.
  *
- * <p>
- * created on 10/07/2020
- * </p>
- *
  * @author arnold.somogyi@gmail.com
  */
 public enum ExitCode {

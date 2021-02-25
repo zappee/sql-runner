@@ -7,10 +7,6 @@ import java.sql.SQLException;
 /**
  * Prints the content of the JDBC ResultSet.
  *
- * <p>
- * created on 12/07/2020
- * </p>
- *
  * @author arnold.somogyi@gmail.com
  */
 public class ResultSetConverter {
