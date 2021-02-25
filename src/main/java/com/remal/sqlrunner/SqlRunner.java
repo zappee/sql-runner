@@ -55,17 +55,17 @@ public class SqlRunner implements Callable<Integer> {
 
     @Option(names = {"-c", "--dialect"},
             defaultValue = Dialect.ORACLE_VALUE,
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             description = "SQL dialect used during the execution of the SQL statement. "
-                    + "Supported SQL dialects: ${COMPLETION-CANDIDATES}.")
+                    + "Supported SQL dialects: ${COMPLETION-CANDIDATES}.%n"
+                    + " Default: " + Dialect.ORACLE_VALUE)
     private Dialect dialect;
 
     @Option(names = {"-e", "--cmdsep"},
             defaultValue = SqlCommandSeparator.SEMICOLON_VALUE,
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             description = "SQL separator is a non-alphanumeric character used to separate multiple SQL statements. "
                     + "Multiply statements is only recommended for SQL INSERT and UPDATE because in this case the "
-                    + "result of the queries will not be displayed. ")
+                    + "result of the queries will not be displayed.%n"
+                    + " Default: "+ SqlCommandSeparator.SEMICOLON_VALUE)
     private String sqlCommandSeparator;
 
     @Option(names = {"-s", "--showHeader"},
