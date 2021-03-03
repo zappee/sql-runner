@@ -34,16 +34,17 @@ public class ResultSetConverter {
         }
 
         int fieldNumber = metadata.getColumnCount();
-
-        StringBuilder row = new StringBuilder();
-        while (resultSet.next()) {
-            for (int i = 1; i <= fieldNumber; i++) {
-                String value = resultSet.getString(i);
-                String formattedValue = Objects.nonNull(value) ? value : "<NULL>";
-                row.append(formattedValue).append(";");
+        if (fieldNumber > 0) {
+            StringBuilder row = new StringBuilder();
+            while (resultSet.next()) {
+                for (int i = 1; i <= fieldNumber; i++) {
+                    String value = resultSet.getString(i);
+                    String formattedValue = Objects.nonNull(value) ? value : "<NULL>";
+                    row.append(formattedValue).append(";");
+                }
+                String s = row.toString().replaceAll(LAST_CHAR_REGEX, EMPTY_STRING) + System.lineSeparator();
+                result.append(s);
             }
-            String s = row.toString().replaceAll(LAST_CHAR_REGEX, EMPTY_STRING) + System.lineSeparator();
-            result.append(s);
         }
 
         return result.toString().trim();
