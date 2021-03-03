@@ -33,44 +33,48 @@ echo "Database server is up and running"
 
 ## 3) Usage
 ~~~~
-Usage: SqlRunner [-?qsv] [-c=<dialect>] [-e=<sqlCommandSeparator>] -U=<user> (-P=<password> | -I)
-                 (-j=<jdbcUrl> | (-h=<host> -p=<port> -d=<database>)) <sqlStatements>
+Usage: SqlRunner [-?qS] [-c=<dialect>] [-e=<commandSeparator>] -U=<user> (-P=<password> | -I)
+                 (-j=<jdbcUrl> | ([-h=<host>] [-p=<port>] -d=<database>)) (-s=<sqlStatements> |
+                 -f=<sqlScriptFile>)
 SQL command line tool. It executes the given SQL and shows the result on the standard output.
 
-General options:
-      <sqlStatements>   SQL statements to be executed. Multiply statements can be provided.
-                          Example: 'insert into...; insert into ...; commit'
-  -?, --help            Display this help and exit.
-  -v, --verbose         It provides additional details as to what the tool is doing.
-  -q, --quiet           In this mode nothing will be printed to the output.
-  -c, --dialect         SQL dialect used during the execution of the SQL statement. Supported SQL
-                          dialects: ORACLE.
-                         Default: ORACLE
-  -e, --cmdsep          SQL separator is a non-alphanumeric character used to separate multiple SQL
-                          statements. Multiply statements is only recommended for SQL INSERT and
-                          UPDATE because in this case the result of the queries will not be
-                          displayed.
-                         Default: ;
-  -s, --showHeader      Shows the name of the fields from the SQL result set.
-  -U, --user            Name for the login.
+  -?, --help         Display this help and exit.
+  -q, --quiet        In this mode nothing will be printed to the output.
+  -c, --dialect      SQL dialect used during the execution of the SQL statement. Supported SQL
+                       dialects: ORACLE.
+                       Default: ORACLE
+  -e, --cmdsep       SQL separator is a non-alphanumeric character used to separate multiple SQL
+                       statements. Multiply statements is only recommended for SQL INSERT and
+                       UPDATE. The result of the queries will not be displayed.
+                       Default: ;
+  -S, --showHeader   Shows the name of the fields from the SQL result set.
+  -U, --user         Name for the login.
 
 Specify a password for the connecting user:
-  -P, --password        Password for the connecting user.
-  -I, --iPassword       Interactive way to get the password for the connecting user.
+  -P, --password     Password for the connecting user.
+  -I, --iPassword    Interactive way to get the password for the connecting user.
 
 Custom configuration:
-  -h, --host            Name of the database server.
-  -p, --port            Number of the port where the server listens for requests.
-  -d, --database        Name of the particular database on the server. Also known as the SID in
-                          Oracle terminology.
+  -h, --host         Name of the database server.
+                       Default: localhost
+  -p, --port         Number of the port where the server listens for requests.
+                       Default: 1521
+  -d, --database     Name of the particular database on the server. Also known as the SID in Oracle
+                       terminology.
 
 Provide a JDBC URL:
-  -j, --jdbcUrl         JDBC URL, example: jdbc:oracle:<drivertype>:@//<host>:<port>/<database>.
+  -j, --jdbcUrl      JDBC URL, example: jdbc:oracle:<drivertype>:@//<host>:<port>/<database>.
+
+SQL statement(s) to be executed:
+  -s, --sql          SQL statements to be executed. Multiply statements can be provided. Example:
+                       'insert into...; insert into ...; commit'
+  -f, --file         Path to the SQL script file.
 
 Exit codes:
   0   Successful program execution.
   1   An unexpected error appeared while executing the SQL statement.
   2   Usage error. The user input for the command was incorrect.
+  3   Internal program error.
 
 Please report issues at arnold.somogyi@gmail.com.
 Documentation, source code: https://github.com/zappee/sql-runner.git

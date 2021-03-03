@@ -14,6 +14,7 @@ import java.util.List;
  * <p>This is a fix for picocli framework.
  * This hides the Java variable name from the command line help.</p>
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
  *
  * @author arnold.somogyi@gmail.com
  */

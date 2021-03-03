@@ -9,6 +9,8 @@ package com.remal.sqlrunner.domain;
  *                                    INSERT INTO user VALUES('arnold'); \
  *                                    COMMIT"</p>
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
+ *
  * @author arnold.somogyi@gmail.com
  */
 public enum SqlCommandSeparator {

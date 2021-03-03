@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 /**
  * Splits the given SQL commands into pieces.
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
+ *
  * @author arnold.somogyi@gmail.com
  */
 public final class SqlCommandsParser {
@@ -20,7 +22,7 @@ public final class SqlCommandsParser {
      */
     public static List<String> parse(String sqlStatements, String sqlCommandSeparator) {
         String[] statements = sqlStatements.split(sqlCommandSeparator);
-        return Arrays.asList(statements).stream().map(String::trim).collect(Collectors.toList());
+        return Arrays.stream(statements).map(String::trim).collect(Collectors.toList());
     }
 
     /**

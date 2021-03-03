@@ -5,6 +5,8 @@ import picocli.CommandLine.Command;
 /**
  * Supported SQL dialects.
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
+ *
  * @author arnold.somogyi@gmail.com
  */
 @Command

@@ -1,91 +1,84 @@
 package com.remal.sqlrunner;
 
-import com.remal.sqlrunner.domain.Dialect;
 import com.remal.sqlrunner.domain.ExitCode;
-import com.remal.sqlrunner.domain.SqlCommandSeparator;
 import com.remal.sqlrunner.util.AnsiColor;
+import com.remal.sqlrunner.util.DevNullPrintStream;
+import com.remal.sqlrunner.util.ResultSetConverter;
+import com.remal.sqlrunner.util.SqlScriptParser;
 import oracle.jdbc.OracleConnection;
 
 import java.io.PrintStream;
-import java.sql.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * This class connects to the database and executes the provided SQL statement.
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
+ *
  * @author arnold.somogyi@gmail.com
  */
 public class SqlStatementExecutor {
 
-    /**
-     * Error message template.
-     */
-    private static final String ERROR_MESSAGE =
-            AnsiColor.RED_BOLD_BRIGHT
-            + "ERROR: An error occurred while executing the sql statement.%n%s%nSQL(s): %s"
-            + AnsiColor.DEFAULT;
+    private static final String NEW_LINE = "\r|\n";
+    private static final String NOTHING = "";
 
-    private PrintStream out = System.out;
-    private boolean verbose = false;
-    private boolean showHeader = false;
+    private PrintStream logWriter;
+    private boolean showHeader;
     private String user;
-    private String password;
-    private List<String> sqlStatements;
+    private byte[] password;
 
     /**
      * Initialization method.
      *
+     * @param quiet if true then no log message will be shown
+     * @param showHeader controls whether the name of the fields from the SQL result set is displayed or not
      * @param user name for the login
      * @param password password for the connecting user
      */
-    public SqlStatementExecutor(String user, String password) {
+    public SqlStatementExecutor(boolean quiet, boolean showHeader, String user, byte[] password) {
+        this.logWriter = quiet ? DevNullPrintStream.getPrintStream() : System.out;
+        this.showHeader = showHeader;
         this.user = user;
         this.password = password;
     }
 
     /**
-     * Set the standard output where the application writes logs.
-     *
-     * @param user name for the login
-     * @param password password for the connecting user
-     * @param out the output writer
-     */
-    public SqlStatementExecutor(String user, String password, PrintStream out) {
-        this.user = user;
-        this.password = password;
-        this.out = out;
-    }
-
-    /**
-     * Executes the given SQL statement and returns with the result as a string.
+     * Executes the given SQL statements and returns with the execution result.
      *
      * @param jdbcUrl the JDBC URL
-     * @return 0 if the SQL statement was executed properly, otherwise 1
+     * @param sqlStatements the SQL statements to be executed
+     * @return 0 if the SQL statement was executed properly
      */
-    public ExitCode execute(String jdbcUrl) {
+    public ExitCode execute(String jdbcUrl, List<String> sqlStatements) {
         ExitCode exitCode = ExitCode.OK;
+
         try (Connection connection = getConnection(jdbcUrl);
              Statement statement = connection.createStatement()) {
 
-            if (verbose) {
-                out.println("executing SQL statement: " + sqlStatementsToString() + "...");
+            for (String sql : sqlStatements) {
+                exitCode = executeSingleSqlStatement(statement, sql);
+                if (exitCode != ExitCode.OK) {
+                    break;
+                }
             }
 
-            // SQL statement list never empty, Picoli checks it
-            if (sqlStatements.size() == 1) {
-                ResultSet resultSet = statement.executeQuery(sqlStatements.get(0));
-                out.println(ResultSetConverter.toString(resultSet, showHeader));
-            } else {
-                for (String sql : sqlStatements) {
-                    statement.addBatch(sql);
-                }
-                statement.executeBatch();
-            }
         } catch (SQLException e) {
-            String errorMessage = String.format(ERROR_MESSAGE, e.toString(), sqlStatementsToString());
-            out.println(errorMessage);
+            String sql = "";
+            showSqlError(sql, e);
             exitCode = ExitCode.SQL_EXECUTION_ERROR;
+
+        } catch (Exception e) {
+            showInternalError(e);
+            exitCode = ExitCode.INTERNAL_ERROR;
+
         } finally {
             showExitCode(exitCode);
         }
@@ -94,54 +87,50 @@ public class SqlStatementExecutor {
     }
 
     /**
-     * Executes the given SQL statement and returns with the result as a string.
+     * Executes the given SQL Script file and returns with the execution result.
      *
-     * @param dialect SQL dialect, used during the execution of the SQL statement
-     * @param host name of the database server
-     * @param port number of the port where the server listens for requests
-     * @param database name of the particular database on the server, lso known as the SID in Oracle terminology
-     * @return 0 if the SQL statement was executed properly, otherwise 1
+     * @param jdbcUrl the JDBC URL
+     * @param sqlScriptFile path to the SQL Script file
+     * @param sqlCommandSeparator a non-alphanumeric character used to separate multiple SQL statements
+     * @return 0 if the SQL statement was executed properly
      */
-    public ExitCode execute(Dialect dialect, String host, int port, String database) {
-        String jdbcUrl = dialect.getJdbcUrl(host, port, database);
-        return execute(jdbcUrl);
+    public ExitCode execute(String jdbcUrl, Path sqlScriptFile, String sqlCommandSeparator) {
+        ExitCode exitCode;
+        try {
+            SqlScriptParser sqlScriptParser = new SqlScriptParser();
+            sqlScriptParser.setDelimiters(sqlCommandSeparator, false);
+
+            logWriter.println(String.format("opening the %s SQL script file...", sqlScriptFile.toString()));
+            List<String> sqlStatements = sqlScriptParser.parse(Files.newBufferedReader(sqlScriptFile));
+            exitCode = execute(jdbcUrl, sqlStatements);
+
+        } catch (Exception e) {
+            showInternalError(e);
+            exitCode = ExitCode.INTERNAL_ERROR;
+        }
+
+        return exitCode;
     }
 
     /**
-     * Flag to control how detailed log is provided by this class.
-     * The default value is false.
+     * Single SQL statement executor.
      *
-     * @param verbose if true then detailed log will be shown
+     * @param statement JDBC statement
+     * @param sql SQL statement to bo executed
+     * @return result of the execution
      */
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
+    private ExitCode executeSingleSqlStatement(Statement statement, String sql) {
+        ExitCode exitCode = ExitCode.OK;
+        logWriter.println("SQL statement: " + sql);
 
-    /**
-     * Set the standard output stream where the application sends the log messages.
-     *
-     * @param out the output where the application prints log messages
-     */
-    public void setStandardOutput(PrintStream out) {
-        this.out = out;
-    }
+        try (ResultSet rs = statement.executeQuery(sql)) {
+            logWriter.println(ResultSetConverter.toString(rs, showHeader));
+        } catch (SQLException e) {
+            showSqlError(sql, e);
+            exitCode = ExitCode.SQL_EXECUTION_ERROR;
+        }
 
-    /**
-     * Flag to control whether the name of the fields from the SQL result set is displayed or not.
-     *
-     * @param showHeader value of the flag
-     */
-    public void setShowHeader(boolean showHeader) {
-        this.showHeader = showHeader;
-    }
-
-    /**
-     * SQL statements to be executed.
-     *
-     * @param sqlStatements the sql statements
-     */
-    public void setSqlStatements(List<String> sqlStatements) {
-        this.sqlStatements = sqlStatements;
+        return exitCode;
     }
 
     /**
@@ -152,15 +141,11 @@ public class SqlStatementExecutor {
      * @throws SQLException in case of error
      */
     private Connection getConnection(String jdbcUrl) throws SQLException {
-        if (verbose) {
-            out.println("getting connection to " + jdbcUrl + "...");
-            out.println(String.format("using '%s' as the username", user));
-        }
+        logWriter.println("getting connection to " + jdbcUrl + "...");
+        logWriter.println(String.format("using '%s' as the username", user));
 
-        Properties properties = getConnectionArguments(user, password);
-        Connection connection = DriverManager.getConnection(jdbcUrl, properties);
-
-        return connection;
+        Properties properties = getConnectionArguments(user, new String(password));
+        return DriverManager.getConnection(jdbcUrl, properties);
     }
 
     /**
@@ -198,24 +183,40 @@ public class SqlStatementExecutor {
             default: color = AnsiColor.DEFAULT;
         }
 
-        out.printf("%sReturn code: %d", color, exitCode.getExitCode());
-        out.printf(AnsiColor.DEFAULT);
-        out.printf("%n%n");
+        logWriter.printf("%sReturn code: %d", color, exitCode.getExitCode());
+        logWriter.printf(AnsiColor.DEFAULT);
+        logWriter.printf("%n%n");
     }
 
     /**
-     * Prints the sql statements in one line..
+     * Shows information about the error message appeared while executing the application.
      *
-     * @return the string representation of the SQL statements
+     * @param e the exception was thrown
      */
-    private String sqlStatementsToString() {
-        StringBuilder sb = new StringBuilder();
-        for (String sql : sqlStatements) {
-            if (sb.length() > 0) {
-                sb.append(SqlCommandSeparator.SEMICOLON.getValue()).append(" ");
-            }
-            sb.append(sql);
-        }
-        return sb.toString();
+    private void showInternalError(Exception e) {
+        String internalErrorMessage = AnsiColor.RED_BOLD_BRIGHT
+                + "ERROR: An internal error occurred while executing the tool.%n"
+                + "Message: %s"
+                + AnsiColor.DEFAULT;
+
+        String errorMessage = String.format(internalErrorMessage, e.toString().replaceAll(NEW_LINE, NOTHING));
+        logWriter.println(errorMessage);
+        e.printStackTrace();
+    }
+
+    /**
+     * Shows information about the error message appeared while executing the SQL statement.
+     * @param sql the SQL statement that was executed
+     * @param e the exception was thrown
+     */
+    private void showSqlError(String sql, SQLException e) {
+        String sqlErrorMessage = AnsiColor.RED_BOLD_BRIGHT
+                + "ERROR: An error occurred while executing the sql statement.%n"
+                + "Message: %s%n"
+                + "SQL: %s"
+                + AnsiColor.DEFAULT;
+
+        String errorMessage = String.format(sqlErrorMessage, e.toString().replaceAll(NEW_LINE, NOTHING), sql);
+        logWriter.println(errorMessage);
     }
 }

@@ -1,11 +1,14 @@
-package com.remal.sqlrunner;
+package com.remal.sqlrunner.util;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * Prints the content of the JDBC ResultSet.
+ *
+ * <p>Copyright 2021 Arnold Somogyi</p>
  *
  * @author arnold.somogyi@gmail.com
  */
@@ -35,7 +38,9 @@ public class ResultSetConverter {
         StringBuilder row = new StringBuilder();
         while (resultSet.next()) {
             for (int i = 1; i <= fieldNumber; i++) {
-                row.append(resultSet.getString(i)).append(";");
+                String value = resultSet.getString(i);
+                String formattedValue = Objects.nonNull(value) ? value : "<NULL>";
+                row.append(formattedValue).append(";");
             }
             String s = row.toString().replaceAll(LAST_CHAR_REGEX, EMPTY_STRING) + System.lineSeparator();
             result.append(s);

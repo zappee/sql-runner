@@ -3,6 +3,8 @@ package com.remal.sqlrunner.util;
 /**
  * Color in console using System.out.println.
  *
+ * <p>Copyright 2021 Arnold Somogyi</p>
+ *
  * @author arnold.somogyi@gmail.com
  */
 public class AnsiColor {
