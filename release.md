@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file.
 
 ### [0.3.0] - 2021-Mar-03
 #### Added
-- execute external SQL Script file: see th `--file` option
+- execute external SQL Script file: see the `--file` option
 - default value for `--port` command
 - default value for `--host` command
 #### Removed
