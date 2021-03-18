@@ -15,20 +15,46 @@ The latest version of the tool only supports Oracle Database server, but other S
 The result of the executed SQL command is displayed on the standard output.
 When there is an error the tool stops with exit code 1 or 2 and the error message is displayed.
 
-SQL-Runner is created with a main purpose to be used in Linux shell-scripts or in Windows command line. 
+SQL-Runner is created with a main purpose to be used in Linux shell-scripts or in Windows command line.
 
-## 2) Use cases
-#### 2.1) Database status check
-A possible use case in Docker environment is to check whether the database server is ready to receive incoming connections or not:
+## 2) Examples
+### 2.1) Check whether the database server is up
+In Docker environment sometime the application server startup must be blocked untill the database server is ready to receive incoming connections.
 ~~~
 #!/bin/bash
 
-until java -jar sql-runner-0.2.0-with-dependencies.jar -j jdbc:oracle:thin:@//oracle-db:1521/ORCLPDB1.localdomain -U "SYS as SYSDBA" -P Oradoc_db1 "select 1 from dual"
+until java -jar sql-runner.jar \
+                    -j jdbc:oracle:thin:@oracle-db:1521/ORCLPDB1.localdomain \
+                    -U "SYS as SYSDBA" \
+                    -P Oradoc_db1 \
+                    "SELECT 1 FROM DUAL"
 do
     echo "The database server in not up and running. Waiting..."
     sleep 0.5
 done
 echo "Database server is up and running"
+~~~
+
+### 2.2) Execute an SQL script file
+The following example executes an Oracle Script file.
+~~~
+java -jar sql-runner.jar
+               -j jdbc:oracle:thin:@$DB_HOST:$DB_PORT/$DB_NAME \
+               -U username \
+               -P password \
+               -f "create-schema.sql"
+~~~
+
+### 2.3) Insert multiply records
+~~~
+java -jar sql-runner.jar
+               -j jdbc:oracle:thin:@$DB_HOST:$DB_PORT/$DB_NAME \
+               -U username \
+               -P password \
+               -s "INSERT INTO customer (id, name) VALUES (1, 'Arnold'); \
+                   INSERT INTO customer (id, name) VALUES (2, 'Stefan'); \
+                   INSERT INTO customer (id, name) VALUES (1, 'Andrei'); \
+                   commit"
 ~~~
 
 ## 3) Usage
