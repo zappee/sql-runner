@@ -64,7 +64,7 @@ public class SqlStatementExecutor {
              Statement statement = connection.createStatement()) {
 
             for (String sql : sqlStatements) {
-                exitCode = executeSingleSqlStatement(statement, sql);
+                exitCode = executeQuery(statement, sql);
                 if (exitCode != ExitCode.OK) {
                     break;
                 }
@@ -119,12 +119,35 @@ public class SqlStatementExecutor {
      * @param sql SQL statement to bo executed
      * @return result of the execution
      */
-    private ExitCode executeSingleSqlStatement(Statement statement, String sql) {
+    private ExitCode executeQuery(Statement statement, String sql) {
         ExitCode exitCode = ExitCode.OK;
         logWriter.println("SQL statement: " + sql);
 
         try (ResultSet rs = statement.executeQuery(sql)) {
             logWriter.println(ResultSetConverter.toString(rs, showHeader));
+        } catch (SQLException e) {
+            if ("SQL string is not Query".contains(e.getMessage())) {
+                executeUpdate(statement, sql);
+            } else {
+                showSqlError(sql, e);
+                exitCode = ExitCode.SQL_EXECUTION_ERROR;
+            }
+        }
+
+        return exitCode;
+    }
+
+    /**
+     * Single SQL statement executor.
+     *
+     * @param statement JDBC statement
+     * @param sql SQL statement to bo executed
+     * @return result of the execution
+     */
+    private ExitCode executeUpdate(Statement statement, String sql) {
+        ExitCode exitCode = ExitCode.OK;
+        try {
+            statement.executeUpdate(sql);
         } catch (SQLException e) {
             showSqlError(sql, e);
             exitCode = ExitCode.SQL_EXECUTION_ERROR;

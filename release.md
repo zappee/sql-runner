@@ -31,3 +31,7 @@ All notable changes to this project will be documented in this file.
 - default value for `--host` command
 #### Removed
 - `--verbose` command
+
+### [0.3.1] - not released yet
+#### Fixed
+- SQL string is not Query exception: if the given SQL in not a query then `statement.executeUpdate()` must be used instead of the `statement.executeQuerystatement.executeQuery()`
