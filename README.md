@@ -8,7 +8,7 @@ _[Release Note](release.md)_
 
 The `SQL-Runner` is a small command-line tool written in Java and can be used on all platforms, for which JRE 8 is available.
 The tool can be used to execute any SQL commands, especially it is suitable for executing SQL `select`, `update` and `delete`.
-You can use it to `insert` data into databases as well, but I think this is not the most effective way to do this.
+You can use the tool to create a new database schema during the application deployment and insert initial data into databases.
 The tool uses a JDBC driver to connect to a specific database and relatively easy to configure.
 The latest version of the tool only supports Oracle Database server, but other SQL dialects can easily be added.
 
