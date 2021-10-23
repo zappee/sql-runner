@@ -108,3 +108,7 @@ Documentation, source code: https://github.com/zappee/sql-runner.git
 
 ## 4) Licence
 BSD (2-clause) licensed.
+
+<a href="https://trackgit.com">
+<img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/kv44pfpaxqrmgnmcfyik" alt="trackgit-views" />
+</a>
