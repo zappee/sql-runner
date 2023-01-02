@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 #### Removed
 - `--verbose` command
 
-### [0.3.1] - not released yet
+### [0.3.1] - 02 January, 2023
 #### Fixed
 - The SQL string is not a query exception: if the given SQL is not a query then `statement.executeUpdate()` must be used instead of the `statement.executeQuerystatement.executeQuery()`
 - Maven build error: `Could not find artifact com.oracle.jdbc:ojdbc8:jar:12.2.0.1 in central`
