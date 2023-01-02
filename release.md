@@ -35,3 +35,4 @@ All notable changes to this project will be documented in this file.
 ### [0.3.1] - not released yet
 #### Fixed
 - The SQL string is not a query exception: if the given SQL is not a query then `statement.executeUpdate()` must be used instead of the `statement.executeQuerystatement.executeQuery()`
+- Maven build error: `Could not find artifact com.oracle.jdbc:ojdbc8:jar:12.2.0.1 in central`

@@ -43,6 +43,13 @@
         <picocli.version>4.6.1</picocli.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>java-net-repo</id>
+            <url>https://broadinstitute.jfrog.io/artifactory/libs-release-local/</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <!-- packaging the project to an auto-launch uber JAR -->
