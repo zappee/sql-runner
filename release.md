@@ -34,4 +34,4 @@ All notable changes to this project will be documented in this file.
 
 ### [0.3.1] - not released yet
 #### Fixed
-- SQL string is not Query exception: if the given SQL in not a query then `statement.executeUpdate()` must be used instead of the `statement.executeQuerystatement.executeQuery()`
+- The SQL string is not a query exception: if the given SQL is not a query then `statement.executeUpdate()` must be used instead of the `statement.executeQuerystatement.executeQuery()`
