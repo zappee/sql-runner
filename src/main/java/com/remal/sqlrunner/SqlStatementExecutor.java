@@ -126,7 +126,7 @@ public class SqlStatementExecutor {
         try (ResultSet rs = statement.executeQuery(sql)) {
             logWriter.println(ResultSetConverter.toString(rs, showHeader));
         } catch (SQLException e) {
-            if ("SQL string is not Query".contains(e.getMessage())) {
+            if ("The SQL string is not a query".contains(e.getMessage())) {
                 executeUpdate(statement, sql);
             } else {
                 showSqlError(sql, e);
