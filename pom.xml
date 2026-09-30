@@ -7,7 +7,7 @@
 
     <groupId>com.remal.sqlrunner</groupId>
     <artifactId>sql-runner</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
 
     <licenses>
         <license>
@@ -43,13 +43,6 @@
         <picocli.version>4.6.1</picocli.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>java-net-repo</id>
-            <url>https://broadinstitute.jfrog.io/artifactory/libs-release-local/</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <!-- packaging the project to an auto-launch uber JAR -->
@@ -58,7 +51,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven.assembly.plugin.version}</version>
                 <configuration>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
                     <descriptors>
                         <descriptor>${basedir}/src/main/resources/assembly.xml</descriptor>
                     </descriptors>
@@ -89,7 +81,7 @@
         </dependency>
         <!-- oracle Database JDBC driver -->
         <dependency>
-            <groupId>com.oracle.jdbc</groupId>
+            <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
             <version>${ojdbc8.version}</version>
         </dependency>
